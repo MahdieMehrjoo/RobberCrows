@@ -1,4 +1,4 @@
-package model;
+package entity;
 
 public abstract class PowerUp {
     protected String type;

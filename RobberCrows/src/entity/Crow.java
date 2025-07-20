@@ -1,6 +1,6 @@
-package model;
+package entity;
 
-import model.Position;
+import entity.Position;
 
 public class Crow implements Movable {
     private String name;

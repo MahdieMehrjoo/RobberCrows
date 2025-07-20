@@ -1,4 +1,4 @@
-package model;
+package entity;
 
 public class Backpack {
     private List<Treasure> treasures;
