@@ -40,16 +40,29 @@ public class Crow implements Movable {
 
         switch (direction) {
             case UP:
-                position.setY(y _ speed);
+                position.setY(y - speed);
                 break;
             case DOWN:
+                position.setY(y + speed);
+                break;
+            case LEFT:
+                position.setX(x - speed);
+                break;
+            case RIGHT:
+                position.setX(x + speed);
                 break;
         }
+        def
     }
 
-    public void collectTreasure (Treasure treasure) { }
+    public void collectTreasure (Treasure treasure) {
+        backpack.addTreasure(treasure);
+        score += treasure.getValue();
+    }
 
-    public void collectFood (Food food) { }
+    public void collectFood (Food food) {
+        energy += food.getNutrition();
+    }
 
     public void hit() {  }
 

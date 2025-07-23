@@ -6,7 +6,28 @@ public class Treasure {
     private Position position;
     private float weight;
     private float volume;
-    private int energy;
+    private int score;
 
-    public Treasure (String type, int value , Position position) {    }
+    public Treasure (String type, int value , Position position, float weight, float volume, int score) {
+        this.type = type;
+        this.value = value;
+        this.position = position;
+        this.weight = weight;
+        this.volume = volume;
+        this.score = score;
+    }
+    // getters
+
+    public int getValue() {
+        return value;
+    }
+
+    public float getWeight() {
+        return weight;
+    }
+    public float getVolume() { return  volume; }
+
+    public int getScore() {
+        return score;
+    }
 }
