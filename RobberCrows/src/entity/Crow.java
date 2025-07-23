@@ -61,14 +61,23 @@ public class Crow implements Movable {
     }
 
     public void collectFood (Food food) {
+
         energy += food.getNutrition();
     }
 
-    public void hit() {  }
+    public void hit() {
+        health--;
+        if (health < 0) health = 0;
+    }
 
-    public void usePowerUp(PowerUp powerUp) {  }
+    public void usePowerUp(PowerUp powerUp) {
+        powerUp.apply(this);
+    }
 
-    public void rest( int time ){ }
+    public void rest( int time ){
+        isResting = true;
+        restTime = time;
+    }
 
     // getter --------------------------------------------------------
     public String getName() {return name;}

@@ -1,5 +1,7 @@
 package entity;
 
+import javax.swing.text.Position;
+
 public class Treasure {
     private String type;
     private int value;
@@ -16,18 +18,21 @@ public class Treasure {
         this.volume = volume;
         this.score = score;
     }
+    @Override
+    public void onCollect(Crow crow){
+        crow.collectTreasure(this);
+    }
     // getters
 
     public int getValue() {
         return value;
     }
-
     public float getWeight() {
         return weight;
     }
     public float getVolume() { return  volume; }
-
     public int getScore() {
         return score;
     }
+    public Position getPosition() { return position; }
 }

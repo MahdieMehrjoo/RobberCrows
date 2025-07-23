@@ -11,6 +11,7 @@ public class Food implements Collectible{
     }
     @Override
     public void onCollect(Crow crow) {
+
         crow.collectFood(this);
     }
 }

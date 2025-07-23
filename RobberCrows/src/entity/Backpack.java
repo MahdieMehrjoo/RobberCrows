@@ -1,5 +1,8 @@
 package entity;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Backpack {
     private List<Treasure> treasures;
     private float currentWeight = 0;
@@ -11,7 +14,7 @@ public class Backpack {
 
     public void addTreasure(Treasure treasure) {
         if (currentWeight + treasure.getWeight() <= maxWeight && currentVolume + treasure.getVolume() <= maxVolume) {
-            treasure.add(treasure);
+            treasures.add(treasure);
             currentWeight += treasure.getWeight();
             currentVolume += treasure.getVolume();
         }
@@ -22,4 +25,10 @@ public class Backpack {
             sum+= t.getValue();
         }
         return sum;
+    }
+
+    public List<Treasure> getTreasures() {
+    return treasures;
+    }
 }
+
