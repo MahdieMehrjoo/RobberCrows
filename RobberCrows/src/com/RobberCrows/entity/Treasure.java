@@ -1,4 +1,4 @@
-package entity;
+package com.RobberCrows.entity;
 
 // import صحیح کلاس Position از پکیج خودت
 import entity.Position;

@@ -1,4 +1,4 @@
-package entity;
+package com.RobberCrows.entity;
 
 // اینترفیس برای اشیایی که قابلیت جمع‌آوری توسط کلاغ دارند
 public interface Collectible {

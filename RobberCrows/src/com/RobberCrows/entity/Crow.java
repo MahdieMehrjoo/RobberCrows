@@ -1,6 +1,6 @@
-package entity;
+package com.RobberCrows.entity;
 
-import entity.Position;
+import com.RobberCrows.entity.Position;
 
 // کلاس کلاغ که رفتار و ویژگی‌های یک بازیکن را مدل می‌کند
 public class Crow implements Movable {

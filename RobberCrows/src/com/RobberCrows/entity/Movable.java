@@ -1,4 +1,4 @@
-package entity;
+package com.RobberCrows.entity;
 
 // اینترفیس برای اشیایی که قابلیت حرکت دارند
 public interface Movable {

@@ -1,4 +1,4 @@
-package entity;
+package com.RobberCrows.entity;
 
 // کلاس انتزاعی قدرت ویژه (PowerUp) برای کلاغ
 public abstract class PowerUp {
