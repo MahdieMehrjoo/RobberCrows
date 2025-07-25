@@ -1,4 +1,4 @@
-package com.RobberCrows.entity;
+package com.robbercrows.entity;
 
 // کلاس غذا که اشیای قابل جمع‌آوری برای افزایش انرژی کلاغ است
 public class Food implements Collectible {

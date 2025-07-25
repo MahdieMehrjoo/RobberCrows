@@ -1,9 +1,9 @@
-package com.RobberCrows.core;
+package com.robbercrows.core;
 import javafx.animation.AnimationTimer;
 import javafx.scene.input.KeyCode;
-import com.RobberCrows.map.GameMap;
-import com.RobberCrows.team.ScoreManager;
-import com.RobberCrows.team.Team;
+import com.robbercrows.map.GameMap;
+import com.robbercrows.team.ScoreManager;
+import com.robbercrows.team.Team;
 
 import java.util.List;
 

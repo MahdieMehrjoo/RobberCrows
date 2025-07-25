@@ -1,4 +1,4 @@
-package com.RobberCrows.entity;
+package com.robbercrows.entity;
 
 import java.util.ArrayList;
 import java.util.List;
