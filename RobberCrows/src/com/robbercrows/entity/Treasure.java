@@ -1,7 +1,7 @@
 package com.robbercrows.entity;
 
 // import صحیح کلاس Position از پکیج خودت
-import entity.Position;
+import com.robbercrows.map.Position;
 
 // کلاس گنج که اشیای قابل جمع‌آوری را مدل می‌کند
 public class Treasure implements Collectible {
