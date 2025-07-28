@@ -35,6 +35,10 @@ public class Position
     // محاسبه فاصله بین موقعیت فعلی و یه موقعیت دیگه
     public double distanceTo(Position other)
     {
+        if (other == null)
+        {
+            throw new IllegalArgumentException("Position cannot be null");
+        }
         int deltaX = this.x - other.x;
         int deltaY = this.y - other.y;
         return Math.sqrt(deltaX * deltaX + deltaY * deltaY);//فرمول فاصله
