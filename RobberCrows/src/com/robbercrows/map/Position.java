@@ -11,6 +11,19 @@ public class Position
 
     //متد ها
 
+    // سازنده پیش فرض
+    public Position()
+    {
+        this.x = 0;
+        this.y = 0;
+    }
+
+    // سازنده با مقداردهی اولیه
+    public Position(int x, int y)
+    {
+        this.x = x;
+        this.y = y;
+    }
     // گرفتن مختصات افقی شیء
     public int getX()
     {
