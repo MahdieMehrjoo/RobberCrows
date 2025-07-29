@@ -2,7 +2,7 @@ package com.robbercrows.map;
 
 import com.robbercrows.entity.Crow;
 
-public class GameObject
+public abstract class GameObject
 {
     //شناسه ها
 
@@ -12,6 +12,41 @@ public class GameObject
     private Position position;
 
     //متد ها
+
+    //سازنده
+    public GameObject(Position position,boolean isActive)
+    {
+        this.position=position;
+        this.isActive=isActive;
+    }
+    //گرفتن وضعیت فعال بودن شیء
+    public boolean isActive()
+    {
+        return isActive;
+    }
+
+    //تنظیم وضعیت فعال بودن شیء
+    public void setActive(boolean active)
+    {
+        this.isActive = active;
+    }
+
+    //گرفتن موقعیت شیء
+    public Position getPosition()
+    {
+        return position;
+    }
+
+    //تنظیم موقعیت شیء
+    public void setPosition(Position position)
+    {
+        if (position == null)
+        {
+            throw new IllegalArgumentException("Position cannot be null");
+        }
+        this.position = position;
+    }
+
     // به‌روزرسانی وضعیت شیء
     public void update()
     {
