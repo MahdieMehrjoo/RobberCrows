@@ -107,4 +107,9 @@ public class RestPoint extends GameObject
             startRest(crow);
         }
     }
+    //for debug
+    @Override
+    public String toString() {
+        return "RestPoint[position=(" + getPosition().getX() + ", " + getPosition().getY() + "), occupied=" + isOccupied + ", restDuration=" + restDuration + "]";
+    }
 }
