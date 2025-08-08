@@ -1,9 +1,11 @@
 package com.robbercrows.core;
-import javafx.animation.AnimationTimer;
-import javafx.scene.input.KeyCode;
+
+import com.robbercrows.entity.Crow;
 import com.robbercrows.map.GameMap;
 import com.robbercrows.team.ScoreManager;
 import com.robbercrows.team.Team;
+import javafx.animation.AnimationTimer;
+import javafx.scene.input.KeyCode;
 
 import java.util.List;
 
@@ -73,8 +75,5 @@ public class Game {
     public void setGameRunning(boolean gameRunning)
     {
 
-    }
-    public static void main(String[] args)
-    {
     }
 }
