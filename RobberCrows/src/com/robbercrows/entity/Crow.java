@@ -116,5 +116,53 @@ public class Crow implements Movable {
     public void setResting(boolean isResting) {this.isResting = isResting;}
     public void setBackpack(Backpack backpack) {this.backpack = backpack;}
     public void setPosition(Position position) {this.position = position;}
+    
+    // متدهای اضافی مورد نیاز برای تعامل با بقیه کلاس‌ها
+    public boolean isDead() {
+        return this.health <= 0 || this.energy <= 0;
+    }
+
+    // گرفتن تیم کلاغ
+    public Team getTeam() {
+        return team;
+    }
+    
+    // تنظیم تیم کلاغ
+    public void setTeam(Team team) {
+        if (team == null) {
+            throw new IllegalArgumentException("Team cannot be null");
+        }this.team = team;
+    }
+    
+    // کم کردن جان کلاغ (برای Obstacle)
+    public void reduceHealth(int amount) {
+        if (amount > 0) {
+            this.health -= amount;
+            if (this.health < 0) this.health = 0;
+        }
+    }
+    
+    // اضافه کردن انرژی (برای EnergyPoint)
+    public void addEnergy(int amount) {
+        if (amount > 0) {
+            this.energy += amount;
+        }
+    }
+    
+    // افزایش انرژی (نام دیگر برای addEnergy)
+    public void increaseEnergy(int amount) {
+        addEnergy(amount);
+    }
+
+    // خالی کردن کوله‌پشتی
+    public void emptyBackpack() {
+        if (backpack != null) {
+            int totalValue = backpack.getTotalValue();
+            if (totalValue > 0) {
+                this.score += totalValue; // امتیاز گنج‌ها به کلاغ اضافه می‌شود
+            }
+            backpack = new Backpack(); // کوله‌پشتی جدید
+        }
+    }
 
 }
