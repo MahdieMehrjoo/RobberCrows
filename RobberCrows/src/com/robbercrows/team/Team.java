@@ -116,8 +116,8 @@ public class Team
         System.out.println("Team " + teamId + " gained " + points + " points, totalScore=" + totalScore);
     }
 
-    // گرفتن امتیاز کل تیم
-    public int getTotalScore()
+    // محاسبه و گرفتن امتیاز کل تیم
+    public int calculateScore()
     {
         return totalScore;
     }

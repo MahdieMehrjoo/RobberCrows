@@ -92,7 +92,6 @@ public class Obstacle extends GameObject
             return;
 
         crow.reduceHealth(damage);
-        crow.reduceEnergy(damage / 10);
         System.out.println("Crow hit obstacle and lost " + damage + " health!");
     }
 }

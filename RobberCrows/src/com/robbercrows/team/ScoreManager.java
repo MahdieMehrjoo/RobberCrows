@@ -1,8 +1,5 @@
 package com.robbercrows.team;
 
-import java.util.HashMap;
-import java.util.Map;
-
 public class ScoreManager {
     //شناسه ها
 

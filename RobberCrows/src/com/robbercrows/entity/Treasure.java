@@ -29,10 +29,7 @@ public class Treasure implements Collectible {
     }
 
     // متد جمع‌آوری گنج توسط کلاغ
-    @Override
-    public void onCollect(Crow crow){
-        crow.collectTreasure(this);
-    }
+    // پیاده‌سازی در انتهای کلاس با مدیریت null و پیام دیباگ قرار دارد
 
     // گرفتن ارزش گنج
     public int getValue() {
@@ -50,4 +47,15 @@ public class Treasure implements Collectible {
     }
     // گرفتن موقعیت گنج
     public Position getPosition() { return position; }
+    
+    // پیاده‌سازی متد جمع‌آوری از Collectible interface
+    @Override
+    public void onCollect(Crow crow)
+    {
+        if (crow != null)
+        {
+            crow.collectTreasure(this);
+            System.out.println("Treasure " + type + " collected by " + crow.getName());
+        }
+    }
 }
