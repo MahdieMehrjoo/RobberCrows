@@ -2,15 +2,14 @@ package com.robbercrows.entity;
 
 // import صحیح کلاس Position از پکیج خودت
 import com.robbercrows.map.Position;
+import com.robbercrows.map.GameObject;
 
 // کلاس گنج که اشیای قابل جمع‌آوری را مدل می‌کند
-public class Treasure implements Collectible {
+public class Treasure extends GameObject implements Collectible {
     // نوع گنج (مثلاً طلا، نقره و ...)
     private String type;
     // ارزش گنج
     private int value;
-    // موقعیت گنج روی نقشه
-    private Position position;
     // وزن گنج
     private float weight;
     // حجم گنج
@@ -20,9 +19,9 @@ public class Treasure implements Collectible {
 
     // سازنده گنج
     public Treasure (String type, int value , Position position, float weight, float volume, int score) {
+        super(position, true);
         this.type = type;
         this.value = value;
-        this.position = position;
         this.weight = weight;
         this.volume = volume;
         this.score = score;
@@ -45,8 +44,8 @@ public class Treasure implements Collectible {
     public int getScore() {
         return score;
     }
-    // گرفتن موقعیت گنج
-    public Position getPosition() { return position; }
+    // گرفتن موقعیت گنج از کلاس والد
+    public Position getPosition() { return super.getPosition(); }
     
     // پیاده‌سازی متد جمع‌آوری از Collectible interface
     @Override
@@ -56,6 +55,27 @@ public class Treasure implements Collectible {
         {
             crow.collectTreasure(this);
             System.out.println("Treasure " + type + " collected by " + crow.getName());
+        }
+    }
+
+    // به‌روزرسانی وضعیت گنج (معمولاً خالی است)
+    @Override
+    public void update() {
+        // No-op for static treasure
+    }
+
+    // نمایش اطلاعات گنج (برای تست/دیباگ)
+    @Override
+    public void render() {
+        System.out.println("Treasure [type=" + type + ", value=" + value + ", position=(" + getPosition().getX() + ", " + getPosition().getY() + ")] ");
+    }
+
+    // تعامل با کلاغ: وقتی نزدیک شود، جمع‌آوری و غیرفعال شود
+    @Override
+    public void interact(Crow crow) {
+        if (isActive() && crow != null) {
+            onCollect(crow);
+            setActive(false);
         }
     }
 }
