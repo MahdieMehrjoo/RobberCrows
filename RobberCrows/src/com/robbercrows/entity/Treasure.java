@@ -46,7 +46,7 @@ public class Treasure extends GameObject implements Collectible {
     }
     // گرفتن موقعیت گنج از کلاس والد
     public Position getPosition() { return super.getPosition(); }
-    
+   
     // پیاده‌سازی متد جمع‌آوری از Collectible interface
     @Override
     public void onCollect(Crow crow)

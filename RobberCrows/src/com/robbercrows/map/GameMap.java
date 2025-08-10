@@ -34,6 +34,12 @@ public class GameMap {
         this.width = width;
         this.height = height;
         this.objects = new ArrayList<>();
+        this.mapLock = new ReentrantLock();
+    }
+
+    // Default constructor
+    public GameMap() {
+        this(20, 20); // Default 20x20 map
     }
     // اضافه کردن یه شیء به نقشه
     public void addObject(GameObject obj)
@@ -41,7 +47,7 @@ public class GameMap {
         if (obj != null)
         {
             objects.add(obj);
-    }}
+        }}
     // حذف یه شیء از نقشه
     public void removeObject(GameObject obj)
     {

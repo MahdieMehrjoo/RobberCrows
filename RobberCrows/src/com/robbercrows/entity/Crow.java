@@ -26,6 +26,13 @@ public class Crow implements Movable {
     // تیمی که کلاغ عضو آن است
     private Team team;
 
+    // وضعیت‌های موقت برای اثرها
+    private volatile boolean magnetActive;
+    private int magnetRadius;
+    private Thread magnetTimerThread;
+    private volatile boolean speedBoostActive;
+    private Thread speedBoostTimerThread;
+
     // سازنده کلاس کلاغ
     // name: نام کلاغ
     // startPosition: موقعیت شروع
@@ -41,6 +48,9 @@ public class Crow implements Movable {
         this.backpack = new Backpack();
         this.position = startPosition;
         this.team = team;
+        this.magnetActive = false;
+        this.magnetRadius = 0;
+        this.speedBoostActive = false;
     }
 
     // متد حرکت کلاغ در جهت داده‌شده
@@ -75,7 +85,8 @@ public class Crow implements Movable {
 
     // جمع‌آوری غذا توسط کلاغ
     public void collectFood (Food food) {
-        energy += food.getNutrition(); // افزایش انرژی
+        if (food == null) return;
+        boostSpeedTemporarily(2.0, food.getDurationMs());
     }
 
     // متد ضربه خوردن کلاغ (کم شدن جان)
@@ -116,7 +127,7 @@ public class Crow implements Movable {
     public void setResting(boolean isResting) {this.isResting = isResting;}
     public void setBackpack(Backpack backpack) {this.backpack = backpack;}
     public void setPosition(Position position) {this.position = position;}
-    
+
     // متدهای اضافی مورد نیاز برای تعامل با بقیه کلاس‌ها
     public boolean isDead() {
         return this.health <= 0 || this.energy <= 0;
@@ -126,14 +137,14 @@ public class Crow implements Movable {
     public Team getTeam() {
         return team;
     }
-    
+
     // تنظیم تیم کلاغ
     public void setTeam(Team team) {
         if (team == null) {
             throw new IllegalArgumentException("Team cannot be null");
         }this.team = team;
     }
-    
+
     // کم کردن جان کلاغ (برای Obstacle)
     public void reduceHealth(int amount) {
         if (amount > 0) {
@@ -141,14 +152,14 @@ public class Crow implements Movable {
             if (this.health < 0) this.health = 0;
         }
     }
-    
+
     // اضافه کردن انرژی (برای EnergyPoint)
     public void addEnergy(int amount) {
         if (amount > 0) {
             this.energy += amount;
         }
     }
-    
+
     // افزایش انرژی (نام دیگر برای addEnergy)
     public void increaseEnergy(int amount) {
         addEnergy(amount);
@@ -163,6 +174,78 @@ public class Crow implements Movable {
             }
             backpack = new Backpack(); // کوله‌پشتی جدید
         }
+    }
+
+    // فعال‌سازی آهن‌ربا
+    public synchronized void activateMagnet(int radius, long durationMs) {
+        if (radius <= 0 || durationMs <= 0) return;
+        this.magnetActive = true;
+        this.magnetRadius = radius;
+        if (magnetTimerThread != null && magnetTimerThread.isAlive()) {
+            magnetTimerThread.interrupt();
+        }
+        magnetTimerThread = new Thread(() -> {
+            try {
+                Thread.sleep(durationMs);
+            } catch (InterruptedException ignored) {
+            } finally {
+                deactivateMagnet();
+            }
+        }, "MagnetTimer-" + name);
+        magnetTimerThread.setDaemon(true);
+        magnetTimerThread.start();
+    }
+
+    // غیرفعال‌سازی آهن‌ربا
+    public synchronized void deactivateMagnet() {
+        magnetActive = false;
+        magnetRadius = 0;
+        if (magnetTimerThread != null) {
+            magnetTimerThread.interrupt();
+            magnetTimerThread = null;
+        }
+    }
+
+    public boolean isMagnetActive() { return magnetActive; }
+    public int getMagnetRadius() { return magnetRadius; }
+
+    // اعمال جذب روی لیست گنج‌ها (طلا/نقره)
+    public void applyMagnetToTreasures(java.util.List<Treasure> treasures) {
+        if (!magnetActive || treasures == null) return;
+        for (Treasure t : treasures) {
+            if (t == null || t.getPosition() == null) continue;
+            if (this.position == null) continue;
+            if (this.position.distanceTo(t.getPosition()) <= magnetRadius) {
+                collectTreasure(t);
+            }
+        }
+    }
+
+    // تقویت موقت سرعت
+    public synchronized void boostSpeedTemporarily(double factor, long durationMs) {
+        if (factor <= 0 || durationMs <= 0) return;
+        int originalSpeed = this.speed;
+        int boosted = (int) Math.max(1, Math.round(originalSpeed * factor));
+        this.speed = boosted;
+        this.speedBoostActive = true;
+        if (speedBoostTimerThread != null && speedBoostTimerThread.isAlive()) {
+            speedBoostTimerThread.interrupt();
+        }
+        final String threadName = "SpeedBoostTimer-" + name;
+        speedBoostTimerThread = new Thread(() -> {
+            try {
+                Thread.sleep(durationMs);
+            } catch (InterruptedException ignored) {
+            } finally {
+                synchronized (Crow.this) {
+                    speed = originalSpeed;
+                    speedBoostActive = false;
+                    speedBoostTimerThread = null;
+                }
+            }
+        }, threadName);
+        speedBoostTimerThread.setDaemon(true);
+        speedBoostTimerThread.start();
     }
 
 }

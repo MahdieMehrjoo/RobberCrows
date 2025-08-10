@@ -1,12 +1,18 @@
 package com.robbercrows.team;
 
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.locks.ReentrantLock;
+
 public class ScoreManager {
     //شناسه ها
 
     // بالاترین امتیاز کل بازی
-    private int highScore;
+    private AtomicInteger highScore;
     // آستانه امتیاز برای اضافه کردن کلاغ جدید
     private final int scoreThreshold;
+
+    // Thread safety lock
+    private final ReentrantLock scoreLock;
 
     //متد ها
 
@@ -17,8 +23,9 @@ public class ScoreManager {
         {
             throw new IllegalArgumentException("Score threshold must be positive");
         }
-        this.highScore = 0;
+        this.highScore = new AtomicInteger(0);
         this.scoreThreshold = scoreThreshold;
+        this.scoreLock = new ReentrantLock();
     }
 
     // اضافه کردن امتیاز به تیم
@@ -51,9 +58,9 @@ public class ScoreManager {
     public void updateHighScore(Team team)
     {
         int teamScore = team.calculateScore();
-        if (teamScore > highScore)
+        if (teamScore > highScore.get())
         {
-            highScore = teamScore;
+            highScore.set(teamScore);
         }
     }
 
@@ -66,13 +73,13 @@ public class ScoreManager {
     // گرفتن بالاترین امتیاز کل بازی
     public int getHighScore()
     {
-        return highScore;
+        return highScore.get();
     }
 
     // ریست کردن همه امتیازات (مثل شروع دوباره بازی)
     public void resetScores()
     {
-        highScore = 0;
+        highScore.set(0);
     }
 
 }

@@ -1,23 +1,26 @@
 package com.robbercrows.entity;
 
-// کلاس غذا که اشیای قابل جمع‌آوری برای افزایش انرژی کلاغ است
+// کلاس غذا مخصوص "پنیر" که سرعت کلاغ را 10 ثانیه دوبرابر می‌کند
 public class Food implements Collectible {
-    // مقدار انرژی که این غذا به کلاغ می‌دهد
-    private int nutrition;
+    // مدت زمان اثر پنیر به میلی‌ثانیه (10 ثانیه)
+    private final long durationMs;
 
-    // سازنده غذا
-    public Food (int nutrition){
-        this.nutrition = nutrition;
+    public Food() {
+        this.durationMs = 10_000L;
     }
 
-    // گرفتن مقدار انرژی غذا
-    public int getNutrition() {
-        return nutrition;
+    public Food(long durationMs) {
+        this.durationMs = durationMs;
     }
 
-    // متد جمع‌آوری غذا توسط کلاغ
+    public long getDurationMs() {
+        return durationMs;
+    }
+
+    // متد جمع‌آوری: اعمال اثر افزایش سرعت موقت روی کلاغ
     @Override
     public void onCollect(Crow crow) {
+        if (crow == null) return;
         crow.collectFood(this);
     }
 }

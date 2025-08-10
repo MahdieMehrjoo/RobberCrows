@@ -1,21 +1,43 @@
 package com.robbercrows.entity;
 
-// کلاس انتزاعی قدرت ویژه (PowerUp) برای کلاغ
-public abstract class PowerUp {
-    // نوع قدرت ویژه (مثلاً پنیر، آهن‌ربا و ...)
-    protected String type;
-    // مدت زمان اثر قدرت ویژه
-    protected int duration;
+// کلاس پاورآپ مخصوص "آهن‌ربا"
+public class PowerUp {
 
-    // سازنده قدرت ویژه
-    public PowerUp (String type, int duration)  {
-        this.type = type;
-        this.duration = duration;
+    // مدت زمان اثر به ثانیه (برای آهن‌ربا: 10 ثانیه)
+    private final int durationSeconds;
+    // شعاع جذب به واحد خانه/تایل (پیشنهادی: 3 خانه)
+    private final int magnetRadius;
+
+    // سازنده پاورآپ آهن‌ربا
+    public PowerUp() {
+        this.durationSeconds = 10;
+        this.magnetRadius = 3;
     }
 
-    // متد اعمال قدرت ویژه روی کلاغ (باید در کلاس فرزند پیاده‌سازی شود)
-    public abstract void apply(Crow crow);
+    // سازنده با مقداردهی دستی (در صورت نیاز)
+    public PowerUp(int durationSeconds, int magnetRadius) {
+        this.durationSeconds = durationSeconds;
+        this.magnetRadius = magnetRadius;
+    }
 
-    // متد حذف اثر قدرت ویژه از کلاغ (باید در کلاس فرزند پیاده‌سازی شود)
-    public abstract void remove(Crow crow);
+    public int getDurationSeconds() {
+        return durationSeconds;
+    }
+
+    public int getMagnetRadius() {
+        return magnetRadius;
+    }
+
+    // اعمال اثر آهن‌ربا روی کلاغ (فعال‌سازی موقت)
+    public void apply(Crow crow) {
+        if (crow == null) return;
+        // فعال‌سازی آهن‌ربا برای مدت مشخص
+        crow.activateMagnet(magnetRadius, durationSeconds * 1000L);
+    }
+
+    // حذف اثر آهن‌ربا (در صورت نیاز به خاموش کردن زودتر از موعد)
+    public void remove(Crow crow) {
+        if (crow == null) return;
+        crow.deactivateMagnet();
+    }
 }

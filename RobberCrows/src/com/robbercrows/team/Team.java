@@ -5,6 +5,8 @@ import com.robbercrows.entity.Crow;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.locks.ReentrantLock;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class Team
 {
@@ -19,7 +21,10 @@ public class Team
     // حداکثر تعداد کلاغ‌های مجاز در تیم (مثل ۵)
     private final int maxMembers;
     //امتیاز تیم
-    private int totalScore;
+    private AtomicInteger totalScore;
+
+    // Thread safety lock
+    private final ReentrantLock teamLock;
 
     // سازنده
     public Team(int teamId, String teamColor, int maxMembers)
@@ -35,7 +40,8 @@ public class Team
         this.teamColor = teamColor;
         this.maxMembers = maxMembers;
         this.members = new ArrayList<>();
-        this.totalScore=0;
+        this.totalScore = new AtomicInteger(0);
+        this.teamLock = new ReentrantLock();
     }
 
     //متد ها
@@ -93,6 +99,12 @@ public class Team
         return new ArrayList<>(members); // Return a copy to prevent external modification
     }
 
+    // گرفتن لیست کلاغ‌های تیم (alias for getMembers)
+    public List<Crow> getCrows()
+    {
+        return new ArrayList<>(members); // Return a copy to prevent external modification
+    }
+
     // گرفتن تعداد کلاغ‌های تیم
     public int getMemberCount()
     {
@@ -112,19 +124,25 @@ public class Team
         {
             throw new IllegalArgumentException("Points must be non-negative");
         }
-        this.totalScore += points;
-        System.out.println("Team " + teamId + " gained " + points + " points, totalScore=" + totalScore);
+        this.totalScore.addAndGet(points);
+        System.out.println("Team " + teamId + " gained " + points + " points, totalScore=" + totalScore.get());
     }
 
     // محاسبه و گرفتن امتیاز کل تیم
     public int calculateScore()
     {
-        return totalScore;
+        return totalScore.get();
+    }
+
+    // گرفتن امتیاز کل تیم (alias for calculateScore)
+    public int getTotalScore()
+    {
+        return totalScore.get();
     }
     //امتیاز تیم رو برای شروع مجدد تیم صفر میکنه
     public void resetTotalScore()
     {
-        this.totalScore = 0;
+        this.totalScore.set(0);
         System.out.println("Team " + teamId + " score reset to 0");
     }
 
@@ -170,5 +188,17 @@ public class Team
     public int hashCode()
     {
         return Objects.hash(teamId);
+    }
+
+    // متد update برای thread safety
+    public void update()
+    {
+        teamLock.lock();
+        try {
+            // Update team logic here
+            // For example: check if any crows are dead, update team status, etc.
+        } finally {
+            teamLock.unlock();
+        }
     }
 }
