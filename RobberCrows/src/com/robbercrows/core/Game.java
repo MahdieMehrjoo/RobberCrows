@@ -9,6 +9,8 @@ import com.robbercrows.team.Team;
 import com.robbercrows.entity.PowerUp;
 import javafx.animation.AnimationTimer;
 import javafx.scene.input.KeyCode;
+import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.paint.Color;
 
 import java.util.List;
 import java.util.ArrayList;
@@ -23,6 +25,12 @@ import java.util.Random;
  // مدیریت حلقه‌ی اصلی بازی (update/render) و Threadهای کلاغ‌ها
  //مدیریت چرخه‌ی ظاهر/محو «آهن‌ربا» روی نقشه و جمع‌آوری آن توسط کلاغ
  // بررسی برنده شدن بازی و کنترل شروع/پایان بازی
+import com.robbercrows.map.GameObject;
+import com.robbercrows.map.Position;
+import com.robbercrows.map.Obstacle;
+import com.robbercrows.map.EnergyPoint;
+import com.robbercrows.map.RestPoint;
+
 public class Game {
     // شناسه ها
     private GameMap gameMap;
@@ -32,6 +40,9 @@ public class Game {
     private AnimationTimer timer;
     private boolean isSimulation;
     private List<Thread> crowThreads;
+    private GraphicsContext graphicsContext;
+    private final int tileSize = 32;
+    private static final int WIN_SCORE = 1000;
 
     // Thread management
     private ExecutorService crowExecutor;
@@ -43,6 +54,7 @@ public class Game {
         this.gameMap = new GameMap();
         this.teams = new ArrayList<>();
         this.scoreManager = new ScoreManager(50); // threshold example: 50 points
+        this.scoreManager = new ScoreManager(WIN_SCORE);
         this.isGameRunning = new AtomicBoolean(false);
         this.crowThreads = new ArrayList<>();
         this.crowExecutor = Executors.newFixedThreadPool(MAX_CROW_THREADS);
@@ -131,8 +143,62 @@ public class Game {
     // رندر وضعیت بازی (فعلاً لاگ متنی؛ در آینده با گرافیک جایگزین می‌شود).
     // همچنین شمارش معکوس زمان باقی‌مانده‌ی نمایش آهن‌ربا چاپ می‌شود.
     public void render() {
-        // Render game state (will be implemented with JavaFX)
-        System.out.println("Rendering game...");
+        // JavaFX rendering
+        if (graphicsContext == null) {
+            return;
+        }
+
+        // Clear
+        double canvasWidth = gameMap.getWidth() * tileSize;
+        double canvasHeight = gameMap.getHeight() * tileSize;
+        graphicsContext.setFill(Color.web("#111111"));
+        graphicsContext.fillRect(0, 0, canvasWidth, canvasHeight);
+
+        // Grid
+        graphicsContext.setStroke(Color.web("#2a2a2a"));
+        for (int x = 0; x <= gameMap.getWidth(); x++) {
+            graphicsContext.strokeLine(x * tileSize, 0, x * tileSize, canvasHeight);
+        }
+        for (int y = 0; y <= gameMap.getHeight(); y++) {
+            graphicsContext.strokeLine(0, y * tileSize, canvasWidth, y * tileSize);
+        }
+
+        // Map objects
+        List<GameObject> objects = gameMap.getObjects();
+        for (GameObject obj : objects) {
+            if (obj == null || !obj.isActive() || obj.getPosition() == null) continue;
+            int ox = obj.getPosition().getX();
+            int oy = obj.getPosition().getY();
+            double px = ox * tileSize;
+            double py = oy * tileSize;
+            if (obj instanceof Obstacle) {
+                graphicsContext.setFill(Color.web("#8B0000"));
+                graphicsContext.fillRect(px + 2, py + 2, tileSize - 4, tileSize - 4);
+            } else if (obj instanceof EnergyPoint) {
+                graphicsContext.setFill(Color.web("#00CED1"));
+                graphicsContext.fillOval(px + 6, py + 6, tileSize - 12, tileSize - 12);
+            } else if (obj instanceof RestPoint) {
+                graphicsContext.setFill(Color.web("#7B68EE"));
+                graphicsContext.fillRoundRect(px + 4, py + 4, tileSize - 8, tileSize - 8, 8, 8);
+            } else {
+                graphicsContext.setFill(Color.GRAY);
+                graphicsContext.fillRect(px + 8, py + 8, tileSize - 16, tileSize - 16);
+            }
+        }
+
+        // Crows
+        List<Team> teamsSnapshot = getTeams();
+        for (Team team : teamsSnapshot) {
+            Color teamColor = parseTeamColor(team.getTeamColor());
+            for (Crow crow : team.getCrows()) {
+                if (crow == null || crow.getPosition() == null) continue;
+                Position p = crow.getPosition();
+                double cx = p.getX() * tileSize + tileSize / 2.0;
+                double cy = p.getY() * tileSize + tileSize / 2.0;
+                graphicsContext.setFill(teamColor);
+                graphicsContext.fillOval(cx - 10, cy - 10, 20, 20);
+            }
+        }
     }
 
     // پایان دادن به بازی: توقف حلقه، متوقف‌سازی Threadها و بستن منابع اجرایی.
@@ -165,8 +231,25 @@ public class Game {
     
     // مدیریت ورودی کاربر (برای نسخه‌ی گرافیکی آینده).
     public void handleInput(KeyCode key) {
-        // Handle player input (will be implemented with JavaFX)
-        System.out.println("Key pressed: " + key);
+        // Simple player control: move the first crow of the first team
+        if (teams.isEmpty() || teams.get(0).getCrows().isEmpty()) return;
+        Crow player = teams.get(0).getCrows().get(0);
+        switch (key) {
+            case UP:
+                player.move(com.robbercrows.entity.Direction.UP);
+                break;
+            case DOWN:
+                player.move(com.robbercrows.entity.Direction.DOWN);
+                break;
+            case LEFT:
+                player.move(com.robbercrows.entity.Direction.LEFT);
+                break;
+            case RIGHT:
+                player.move(com.robbercrows.entity.Direction.RIGHT);
+                break;
+            default:
+                break;
+        }
     }
     
     // فعال‌سازی حالت شبیه‌سازی (بدون ورودی کاربر).
@@ -192,6 +275,8 @@ public class Game {
         
         if (winner != null && highestScore >= 1000) { // Win condition
             System.out.println("Winner: Team " + winner.getTeamId() + " with score: " + highestScore);
+        if (winner != null && highestScore >= WIN_SCORE) { // Win condition
+            System.out.println("Winner: Team #" + winner.getTeamId() + " (" + winner.getTeamColor() + ") with score: " + highestScore);
             endGame();
         }
     }
@@ -247,6 +332,24 @@ public class Game {
     //دسترسی به نقشه‌ی بازی.
     public GameMap getGameMap() {
         return gameMap;
+    }
+
+    // Renderer wiring
+    public void setGraphicsContext(GraphicsContext gc) {
+        this.graphicsContext = gc;
+    }
+
+    private Color parseTeamColor(String colorName) {
+        if (colorName == null) return Color.ORANGE;
+        switch (colorName.trim().toUpperCase()) {
+            case "RED": return Color.CRIMSON;
+            case "BLUE": return Color.DODGERBLUE;
+            case "GREEN": return Color.LIMEGREEN;
+            case "YELLOW": return Color.GOLD;
+            case "PURPLE": return Color.MEDIUMPURPLE;
+            default:
+                try { return Color.web(colorName); } catch (Exception ignored) { return Color.ORANGE; }
+        }
     }
     
     // Cleanup method
