@@ -2,6 +2,8 @@ package com.robbercrows.entity;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.locks.ReentrantLock;
+import java.util.Collections;
 
 // کلاس کوله‌پشتی برای ذخیره گنج‌های جمع‌آوری‌شده توسط کلاغ
 public class Backpack {
@@ -16,29 +18,49 @@ public class Backpack {
     // حداکثر حجم مجاز کوله‌پشتی
     private float maxVolume = 10;
 
+    // Thread safety lock
+    private final ReentrantLock backpackLock;
+
     // سازنده پیش‌فرض کوله‌پشتی
-    public Backpack() { }
+    public Backpack() {
+        this.backpackLock = new ReentrantLock();
+    }
 
     // اضافه کردن گنج به کوله‌پشتی (در صورت کافی بودن وزن و حجم)
     public void addTreasure(Treasure treasure) {
-        if (currentWeight + treasure.getWeight() <= maxWeight && currentVolume + treasure.getVolume() <= maxVolume) {
-            treasures.add(treasure);
-            currentWeight += treasure.getWeight();
-            currentVolume += treasure.getVolume();
+        backpackLock.lock();
+        try {
+            if (currentWeight + treasure.getWeight() <= maxWeight && currentVolume + treasure.getVolume() <= maxVolume) {
+                treasures.add(treasure);
+                currentWeight += treasure.getWeight();
+                currentVolume += treasure.getVolume();
+            }
+        } finally {
+            backpackLock.unlock();
         }
     }
 
     // محاسبه مجموع ارزش گنج‌های داخل کوله‌پشتی
     public int getTotalValue() {
-        int sum = 0;
-        for (Treasure t : treasures) {
-            sum += t.getValue();
+        backpackLock.lock();
+        try {
+            int sum = 0;
+            for (Treasure t : treasures) {
+                sum += t.getValue();
+            }
+            return sum;
+        } finally {
+            backpackLock.unlock();
         }
-        return sum;
     }
 
     // گرفتن لیست گنج‌های داخل کوله‌پشتی
     public List<Treasure> getTreasures() {
-        return treasures;
+        backpackLock.lock();
+        try {
+            return new ArrayList<>(treasures); // Return copy for thread safety
+        } finally {
+            backpackLock.unlock();
+        }
     }
 }

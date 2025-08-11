@@ -1,6 +1,8 @@
 package com.robbercrows.map;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.locks.ReentrantLock;
+import java.util.Collections;
 
 public class GameMap {
 
@@ -13,6 +15,9 @@ public class GameMap {
     // لیست همه اشیای نقشه برای مدیریت یکپارچه
     private List<GameObject> objects;
 
+    // Thread safety lock
+    private final ReentrantLock mapLock;
+
 
     //متد ها
     //سازنده
@@ -20,6 +25,12 @@ public class GameMap {
         this.width = width;
         this.height = height;
         this.objects = new ArrayList<>();
+        this.mapLock = new ReentrantLock();
+    }
+
+    // Default constructor
+    public GameMap() {
+        this(20, 20); // Default 20x20 map
     }
     // اضافه کردن یه شیء به نقشه
     public void addObject(GameObject obj)
@@ -27,7 +38,7 @@ public class GameMap {
         if (obj != null)
         {
             objects.add(obj);
-    }}
+        }}
     // حذف یه شیء از نقشه
     public void removeObject(GameObject obj)
     {
