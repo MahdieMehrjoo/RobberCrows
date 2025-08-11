@@ -47,7 +47,7 @@ public class Treasure implements Collectible {
     }
     // گرفتن موقعیت گنج
     public Position getPosition() { return position; }
-    
+
     // پیاده‌سازی متد جمع‌آوری از Collectible interface
     @Override
     public void onCollect(Crow crow)
