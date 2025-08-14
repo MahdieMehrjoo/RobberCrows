@@ -1,6 +1,7 @@
 package com.robbercrows.map;
 
 import com.robbercrows.entity.Crow;
+import com.robbercrows.team.Team;
 
 public class RestPoint extends GameObject
 {
@@ -24,6 +25,12 @@ public class RestPoint extends GameObject
         this.isOccupied = false;
         this.restCounter = 0;
         this.restingCrow = null;
+    }
+
+    // سازنده پیش‌فرض با 20 ثانیه
+    public RestPoint(Position position)
+    {
+        this(position, 20); // 20 ثانیه به جای 120
     }
 
     // گرفتن مدت زمان استراحت
@@ -56,8 +63,8 @@ public class RestPoint extends GameObject
     public void startRest(Crow crow)
     {
         if (crow == null) {
-        throw new IllegalArgumentException("Crow cannot be null");
-    }
+            throw new IllegalArgumentException("Crow cannot be null");
+        }
         isOccupied = true;
         restCounter = restDuration;
         restingCrow = crow;
@@ -70,6 +77,12 @@ public class RestPoint extends GameObject
         isOccupied = false;
         if (restingCrow != null)
         {
+            // Add backpack value to the team score, then empty backpack
+            int totalValue = restingCrow.getBackpack() != null ? restingCrow.getBackpack().getTotalValue() : 0;
+            Team team = restingCrow.getTeam();
+            if (team != null && totalValue > 0) {
+                team.addTotalScore(totalValue);
+            }
             restingCrow.emptyBackpack();
             System.out.println("Crow finished resting and emptied backpack at RestPoint.");
             restingCrow = null;

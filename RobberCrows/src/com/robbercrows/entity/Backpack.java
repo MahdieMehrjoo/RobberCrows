@@ -12,11 +12,11 @@ public class Backpack {
     // وزن فعلی کوله‌پشتی
     private float currentWeight = 0;
     // حداکثر وزن مجاز کوله‌پشتی
-    private float maxWeight = 10;
+    private float maxWeight = 20;
     // حجم فعلی کوله‌پشتی
     private float currentVolume = 0;
     // حداکثر حجم مجاز کوله‌پشتی
-    private float maxVolume = 10;
+    private float maxVolume = 20;
 
     // Thread safety lock
     private final ReentrantLock backpackLock;

@@ -176,6 +176,18 @@ public class Crow implements Movable {
         }
     }
 
+    // چک کردن پر بودن کوله‌پشتی
+    public boolean isBackpackFull() {
+        if (backpack == null) return false;
+        return backpack.getTreasures().size() >= 8; // حداکثر 8 گنج
+    }
+
+    // گرفتن تعداد گنج‌های موجود در کوله‌پشتی
+    public int getBackpackTreasureCount() {
+        if (backpack == null) return 0;
+        return backpack.getTreasures().size();
+    }
+
     // فعال‌سازی آهن‌ربا
     public synchronized void activateMagnet(int radius, long durationMs) {
         if (radius <= 0 || durationMs <= 0) return;
@@ -208,6 +220,7 @@ public class Crow implements Movable {
 
     public boolean isMagnetActive() { return magnetActive; }
     public int getMagnetRadius() { return magnetRadius; }
+    public boolean isSpeedBoostActive() { return speedBoostActive; }
 
     // اعمال جذب روی لیست گنج‌ها (طلا/نقره)
     public void applyMagnetToTreasures(java.util.List<Treasure> treasures) {

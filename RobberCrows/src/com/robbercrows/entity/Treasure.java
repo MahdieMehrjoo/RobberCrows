@@ -1,8 +1,7 @@
 package com.robbercrows.entity;
 
-// import صحیح کلاس Position از پکیج خودت
-import com.robbercrows.map.Position;
 import com.robbercrows.map.GameObject;
+import com.robbercrows.map.Position;
 
 // کلاس گنج که اشیای قابل جمع‌آوری را مدل می‌کند
 public class Treasure extends GameObject implements Collectible {
@@ -34,6 +33,10 @@ public class Treasure extends GameObject implements Collectible {
     public int getValue() {
         return value;
     }
+    // گرفتن نوع گنج
+    public String getType() {
+        return type;
+    }
     // گرفتن وزن گنج
     public float getWeight() {
         return weight;
@@ -44,8 +47,6 @@ public class Treasure extends GameObject implements Collectible {
     public int getScore() {
         return score;
     }
-    // گرفتن موقعیت گنج از کلاس والد
-    public Position getPosition() { return super.getPosition(); }
    
     // پیاده‌سازی متد جمع‌آوری از Collectible interface
     @Override
