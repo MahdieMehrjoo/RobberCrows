@@ -27,8 +27,8 @@ public class GameMap {
     private static final int OBSTACLE_COUNT = 6;
     private static final int FOOD_COUNT = 4;
     private static final int POWERUP_COUNT = 3;
-    private static final int SILVER_TREASURE_COUNT = 24;
-    private static final int GOLD_TREASURE_COUNT = 12;
+    private static final int SILVER_TREASURE_COUNT = 12;
+    private static final int GOLD_TREASURE_COUNT = 6;
     private static final int SILVER_VALUE = 15;
     private static final int GOLD_VALUE = 35;
     private static final float DEFAULT_TREASURE_WEIGHT = 1.0f;
