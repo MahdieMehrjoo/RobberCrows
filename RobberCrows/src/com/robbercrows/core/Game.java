@@ -59,18 +59,18 @@ public class Game {
     public void startGame() {
         if (isGameRunning.compareAndSet(false, true)) {
             System.out.println("Game started!");
-            
+
             // Generate new map
             gameMap.generateMap();
-            
+
             // Start crow threads
             startCrowThreads();
-            
+
             // Start game loop
             startGameLoop();
         }
     }
-    
+
     private void startCrowThreads() {
         for (Team team : teams) {
             for (Crow crow : team.getCrows()) {
@@ -78,11 +78,11 @@ public class Game {
             }
         }
     }
-    
+
     private void crowAI(Crow crow) {
         // Improved AI: seek nearest treasure or energy; otherwise random walk.
         if (crow.isDead()) return;
-        
+
         // Stop moving if energy is completely depleted
         if (crow.getEnergy() <= 0) {
             System.out.println(crow.getName() + " has no energy - cannot move!");
@@ -98,7 +98,7 @@ public class Game {
         Position crowPos = crow.getPosition();
         GameObject nearestTarget = null;
         double nearestDist = Double.MAX_VALUE;
-        
+
         // If energy is very low, prioritize energy points
         if (crow.getEnergy() < 20) {
             for (GameObject obj : gameMap.getObjects()) {
@@ -116,7 +116,7 @@ public class Game {
                 return;
             }
         }
-        
+
         // If backpack is full, prioritize rest points
         if (crow.isBackpackFull()) {
             for (GameObject obj : gameMap.getObjects()) {
@@ -134,12 +134,12 @@ public class Game {
                 return;
             }
         }
-        
+
         // Otherwise, seek treasures and other items
         for (GameObject obj : gameMap.getObjects()) {
             if (obj == null || !obj.isActive() || obj.getPosition() == null) continue;
             if (obj instanceof Obstacle) continue;
-            
+
             // Prefer energy if low
             if (crow.getEnergy() < 30 && !(obj instanceof EnergyPoint)) continue;
             // Prefer food if speed boost is not active
@@ -192,12 +192,12 @@ public class Game {
             randomWalk(crow);
         }
     }
-    
+
     private void moveTowardsTarget(Crow crow, Position target) {
         Position crowPos = crow.getPosition();
         int dx = Integer.compare(target.getX(), crowPos.getX());
         int dy = Integer.compare(target.getY(), crowPos.getY());
-        
+
         // Try axis with greater delta first
         com.robbercrows.entity.Direction dir = null;
         if (Math.abs(dx) >= Math.abs(dy)) {
@@ -213,14 +213,14 @@ public class Game {
                 dir = dx < 0 ? com.robbercrows.entity.Direction.LEFT : (dx > 0 ? com.robbercrows.entity.Direction.RIGHT : null);
             }
         }
-        
+
         if (dir != null) {
             tryMoveCrow(crow, dir);
         } else {
             randomWalk(crow);
         }
     }
-    
+
     private void randomWalk(Crow crow) {
         com.robbercrows.entity.Direction[] dirs = com.robbercrows.entity.Direction.values();
         com.robbercrows.entity.Direction dir = dirs[(int) (Math.random() * dirs.length)];
@@ -228,12 +228,12 @@ public class Game {
         for (int i = 0; i < 4 && isMoveBlocked(crow, dir); i++) {
             dir = dirs[(int) (Math.random() * dirs.length)];
         }
-        
+
         if (dir != null) {
             tryMoveCrow(crow, dir);
         }
     }
-    
+
     private void startGameLoop() {
         timer = new AnimationTimer() {
             @Override
@@ -248,7 +248,7 @@ public class Game {
         };
         timer.start();
     }
-    
+
     public void update() {
         gameLock.lock();
         try {
@@ -272,7 +272,7 @@ public class Game {
                             obj.interact(crow);
                         }
                     }
-                    
+
                     // Apply magnet effect if active
                     if (crow.isMagnetActive()) {
                         List<GameObject> nearbyTreasures = gameMap.getItemsAround(crow.getPosition());
@@ -292,13 +292,13 @@ public class Game {
             gameLock.unlock();
         }
     }
-    
+
     private void updateTeams() {
         for (Team team : teams) {
             team.update();
         }
     }
-    
+
     public void render() {
         // JavaFX rendering
         if (graphicsContext == null) {
@@ -328,7 +328,7 @@ public class Game {
             int oy = obj.getPosition().getY();
             double px = ox * tileSize;
             double py = oy * tileSize;
-            
+
             if (obj instanceof Obstacle) {
                 // موانع: مربع‌های قرمز بزرگ و واضح
                 graphicsContext.setFill(Color.web("#FF0000"));
@@ -407,32 +407,32 @@ public class Game {
                 Position p = crow.getPosition();
                 double cx = p.getX() * tileSize + tileSize / 2.0;
                 double cy = p.getY() * tileSize + tileSize / 2.0;
-                
+
                 // کلاغ: دایره‌های بزرگ‌تر
                 graphicsContext.setFill(teamColor);
                 graphicsContext.fillOval(cx - 12, cy - 12, 24, 24);
-                
+
                 // حاشیه تیره
                 graphicsContext.setStroke(Color.BLACK);
                 graphicsContext.setLineWidth(2);
                 graphicsContext.strokeOval(cx - 12, cy - 12, 24, 24);
-                
+
                 // نشانگر جهت (برای کلاغ بازیکن)
                 if (team.getTeamId() == 1 && crow == team.getCrows().get(0)) {
                     graphicsContext.setFill(Color.WHITE);
                     graphicsContext.fillOval(cx - 3, cy - 3, 6, 6);
                 }
-                
+
                 // نمایش نوار انرژی بالای کلاغ
                 double energyBarWidth = 20;
                 double energyBarHeight = 4;
                 double energyBarX = cx - energyBarWidth / 2;
                 double energyBarY = cy - 18;
-                
+
                 // پس‌زمینه نوار انرژی
                 graphicsContext.setFill(Color.DARKGRAY);
                 graphicsContext.fillRect(energyBarX, energyBarY, energyBarWidth, energyBarHeight);
-                
+
                 // نوار انرژی بر اساس درصد انرژی
                 double energyPercent = Math.max(0, Math.min(1, crow.getEnergy() / 100.0));
                 if (energyPercent > 0.5) {
@@ -443,7 +443,7 @@ public class Game {
                     graphicsContext.setFill(Color.RED);
                 }
                 graphicsContext.fillRect(energyBarX, energyBarY, energyBarWidth * energyPercent, energyBarHeight);
-                
+
                 // نمایش تعداد گنج‌های کوله‌پشتی
                 if (crow.getBackpack() != null && crow.getBackpackTreasureCount() > 0) {
                     graphicsContext.setFill(Color.ORANGE);
@@ -452,37 +452,37 @@ public class Game {
                 }
             }
         }
-        
+
         // Reset line width
         graphicsContext.setLineWidth(1);
     }
-    
+
     public void endGame() {
         if (isGameRunning.compareAndSet(true, false)) {
             System.out.println("Game ended!");
-            
+
             // Stop all crow threads
             stopAllCrowThreads();
-            
+
             // Stop game loop
             if (timer != null) {
                 timer.stop();
             }
-            
+
             // Shutdown executor
             if (crowExecutor != null) {
                 crowExecutor.shutdown();
             }
         }
     }
-    
+
     private void stopAllCrowThreads() {
         for (Thread thread : crowThreads) {
             thread.interrupt();
         }
         crowThreads.clear();
     }
-    
+
     public void handleInput(KeyCode key) {
         // Player control: move the first crow of the first team with collision/bounds
         if (teams.isEmpty() || teams.get(0).getCrows().isEmpty()) return;
@@ -519,21 +519,21 @@ public class Game {
                 break;
         }
     }
-    
+
     public void runSimulation() {
         if (!isSimulation) {
             isSimulation = true;
             System.out.println("Simulation started!");
         }
     }
-    
+
     public void checkWinner() {
         Team winner = null;
         int highestScore = -1;
-        
+
         // Check for teams that have lost all members
         List<Team> teamsToRemove = new ArrayList<>();
-        
+
         for (Team team : teams) {
             // Remove dead crows
             List<Crow> deadCrows = new ArrayList<>();
@@ -548,31 +548,31 @@ public class Game {
             for (Crow deadCrow : deadCrows) {
                 team.removeMember(deadCrow);
             }
-            
+
             // Check if team has no members left
             if (team.getMemberCount() == 0) {
                 teamsToRemove.add(team);
                 System.out.println("Team " + team.getTeamId() + " has no members left - eliminated!");
                 continue;
             }
-            
+
             int teamScore = team.getTotalScore();
             if (teamScore > highestScore) {
                 highestScore = teamScore;
                 winner = team;
             }
-            
+
             // Add new member when score reaches 50
             if (teamScore >= 50 && team.getMemberCount() < team.getMaxMembers()) {
                 addNewTeamMember(team);
             }
         }
-        
+
         // Remove eliminated teams
         for (Team eliminatedTeam : teamsToRemove) {
             teams.remove(eliminatedTeam);
         }
-        
+
         // Check if only one team remains
         if (teams.size() == 1) {
             winner = teams.get(0);
@@ -580,25 +580,25 @@ public class Game {
             endGame();
             return;
         }
-        
+
         // Check if no teams remain
         if (teams.isEmpty()) {
             System.out.println("💀 All teams eliminated - Game Over! 💀");
             endGame();
             return;
         }
-        
+
         // Check for score-based winner
         if (winner != null && highestScore >= WIN_SCORE) {
             System.out.println("🏆 Winner by score: Team #" + winner.getTeamId() + " (" + winner.getTeamColor() + ") with score: " + highestScore + "! 🏆");
             endGame();
         }
     }
-    
+
     public Team getWinningTeam() {
         Team winner = null;
         int highestScore = -1;
-        
+
         for (Team team : teams) {
             int teamScore = team.getTotalScore();
             if (teamScore > highestScore) {
@@ -606,52 +606,52 @@ public class Game {
                 winner = team;
             }
         }
-        
+
         if (winner != null && highestScore >= WIN_SCORE) {
             return winner;
         }
         return null;
     }
-    
+
     private void addNewTeamMember(Team team) {
         if (team.getMemberCount() >= team.getMaxMembers()) return;
-        
+
         // پیدا کردن موقعیت خالی برای کلاغ جدید
         Position newPos = findEmptyPosition();
         if (newPos != null) {
             Crow newCrow = new Crow("AI-" + team.getTeamColor() + "-" + (team.getMemberCount() + 1), newPos, team);
             team.addMember(newCrow);
             System.out.println("New member added to Team " + team.getTeamId() + " at position " + newPos.getX() + "," + newPos.getY());
-            
+
             // شروع thread برای کلاغ جدید
             startCrowThread(newCrow);
         }
     }
-    
+
     private void startCrowThread(Crow crow) {
         Thread crowThread = new Thread(() -> {
             while (isGameRunning.get() && !Thread.currentThread().isInterrupted()) {
                 try {
                     crowAI(crow);
-                    Thread.sleep(250); // Slow down AI updates to make computer less dominant
+                    Thread.sleep(100); // Update every 100ms
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
                     break;
                 }
             }
         }, "Crow-" + crow.getName());
-        
+
         crowThreads.add(crowThread);
         crowThread.start();
     }
-    
+
     private Position findEmptyPosition() {
         // پیدا کردن موقعیت خالی در نقشه
         for (int x = 0; x < gameMap.getWidth(); x++) {
             for (int y = 0; y < gameMap.getHeight(); y++) {
                 Position pos = new Position(x, y);
                 boolean isEmpty = true;
-                
+
                 // چک کردن اینکه آیا کلاغی در این موقعیت هست
                 for (Team team : teams) {
                     for (Crow crow : team.getCrows()) {
@@ -662,7 +662,7 @@ public class Game {
                     }
                     if (!isEmpty) break;
                 }
-                
+
                 // چک کردن اینکه آیا شیءی در این موقعیت هست
                 if (isEmpty) {
                     for (GameObject obj : gameMap.getObjects()) {
@@ -672,7 +672,7 @@ public class Game {
                         }
                     }
                 }
-                
+
                 if (isEmpty) {
                     return pos;
                 }
@@ -680,23 +680,23 @@ public class Game {
         }
         return new Position(0, 0); // موقعیت پیش‌فرض
     }
-    
+
     public void switchToSinglePlayer(Crow computerCrow) {
         // Switch to single player mode
         System.out.println("Switching to single player mode");
     }
-    
+
     public void stopSimulation() {
         if (isSimulation) {
             isSimulation = false;
             System.out.println("Simulation stopped!");
         }
     }
-    
+
     public List<Team> getTeams() {
         return new ArrayList<>(teams); // Return copy for thread safety
     }
-    
+
     public void addTeam(Team team) {
         gameLock.lock();
         try {
@@ -705,7 +705,7 @@ public class Game {
             gameLock.unlock();
         }
     }
-    
+
     public ScoreManager getScoreManager() {
         return scoreManager;
     }
@@ -713,7 +713,7 @@ public class Game {
     public boolean isGameRunning() {
         return isGameRunning.get();
     }
-    
+
     public void setGameRunning(boolean gameRunning) {
         if (gameRunning) {
             startGame();
@@ -721,7 +721,7 @@ public class Game {
             endGame();
         }
     }
-    
+
     public GameMap getGameMap() {
         return gameMap;
     }
@@ -772,10 +772,10 @@ public class Game {
 
     private void tryMoveCrow(Crow crow, com.robbercrows.entity.Direction direction) {
         if (isMoveBlocked(crow, direction)) return;
-        
+
         // Consume energy when moving
         crow.setEnergy(Math.max(0, crow.getEnergy() - 1));
-        
+
         crow.move(direction);
         // Clamp to bounds in case speed > 1
         Position p = crow.getPosition();
@@ -797,7 +797,7 @@ public class Game {
                 try { return Color.web(colorName); } catch (Exception ignored) { return Color.ORANGE; }
         }
     }
-    
+
     // Cleanup method
     public void cleanup() {
         endGame();
