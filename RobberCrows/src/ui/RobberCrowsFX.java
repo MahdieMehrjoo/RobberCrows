@@ -1,4 +1,4 @@
-package com.robbercrows.ui;
+package ui;
 
 import com.robbercrows.core.Game;
 import com.robbercrows.entity.Crow;
